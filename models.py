@@ -1,9 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
 
 Base = declarative_base()
-
 
 class Data(Base):
     __tablename__ = 'data'
@@ -23,6 +21,7 @@ class Data(Base):
 
 class Records(Base):
     __tablename__ = 'records'
+
     id = Column(Integer, primary_key=True)
     person = Column(Text, nullable=False)
     data_id = Column(Integer, ForeignKey('Data.id'))
@@ -35,15 +34,3 @@ class Records(Base):
             'person': self.person,
             'data_id': self.data_id,
         }
-
-
-# user = "challenger"
-# password = "not_the_real_password"
-# dbname = "coding-challenge-db"
-# host = "34.84.8.142"
-
-
-# engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:5432/{dbname}')
-
-
-# Base.metadata.create_all(engine)

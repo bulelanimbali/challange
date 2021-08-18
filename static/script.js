@@ -6,3 +6,4 @@ toastr.options = {
   "timeOut": "10000",
   "extendedTimeOut": "1000",
 }
+

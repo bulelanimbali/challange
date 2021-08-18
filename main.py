@@ -2,25 +2,26 @@
 
 It looks for "app" in the "main.py" class to run flask with gunicorn"""
 
-import time
-import logging
-from pandas import DataFrame
 from flask import Flask, render_template, request
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from flask.logging import create_logger
-from sqlalchemy.sql.expression import column, text
+from models import Base, Data, Records 
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from configparser import ConfigParser
+import old_db_files.test_gets as gets
+import logging
+import time
 import json
 
-from models import Base, Data, Records 
-import test_gets as gets
+cfg = ConfigParser()
+cfg.read('database.ini')
 
-user = "challenger"
-password = "not_the_real_password"
-dbname = "coding-challenge-db"
-host = "34.84.8.142"
+user = cfg.get('postgresql','user')
+password= cfg.get('postgresql','password')
+dbname= cfg.get('postgresql','dbname')
+host= cfg.get('postgresql','host')
 
-
+# I get a Higher score when it is stored in the main file 
 engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:5432/{dbname}')
 
 
@@ -72,15 +73,16 @@ def at_log():
 
 @app.route('/test/<int:item_count>', methods=['GET'])
 def at_test(item_count=None):
-    """Runs when GET requested on '/login/<user_id>'.
-
-    The main endpoint to test the time it takes to process the items in the database.
+    """
+    DESC:
+        The main endpoint to test the time it takes to process the items in the database.
 
     Args:
         item_count=None (str): sets the number of items to count after the '/test/' path
 
     Return:
-        render_template (flask): html template based on logic from this app"""
+        render_template (flask): html template based on logic from this app
+    """
     log.info("@ at_test(item_count=None): %s", item_count)
 
     #  ˅This is the script that measures the performance, not allowed to edit this section.˅ 
@@ -91,11 +93,19 @@ def at_test(item_count=None):
     type_query = request.args.get('type', type = str)
     data = session.query(Data, Records).outerjoin(Data, Records.data_id==Data.id)\
         .filter(Records.person==person_query).limit(item_count)
-    
+
+    if type_query == 'text':
+        text_json =  [i[0].text for i in data]
+        type = 'text'
+    else:
+        text_json =  [i[0].json for i in data]
+        type = 'json'
+
+    print(type_query)
     json_records = json.loads(json.dumps({
-        'text':[i[0].text for i in data],
+        'type':type,
         "id":[i[0].id for i in  data],
-        "json":[i[0].json for i in data],
+        "json_text": text_json,
         'person': data[0][1].person
     }))
     
@@ -104,7 +114,6 @@ def at_test(item_count=None):
         records=json_records,
         item_count=item_count,
         hit=hit_time)
-
 
 if __name__ == "__main__":
     # This is used when running locally only. When deploying to Google app

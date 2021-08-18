@@ -1,12 +1,8 @@
 {% extends "block-container.html" %}
 
 {% block json %}
-<script>
-	console.log("--> at json <--")
-</script>
 
-
-<h1  id='text_or_json' style="color: coral;">Database Log of </h1>
+<h1  id='text_or_json' style="color: coral;">Database Log of  </h1>
 
 <h2 id="person">for peson:  </h2>
 <h3 id="items">item amount: {{ item_count }} </h3>
@@ -16,7 +12,7 @@
 	<thead>
 		<tr style="text-align: right;">
 			<th>ID</th>
-			<th>JSON</th>
+			<th id="text_or_json_table"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -24,10 +20,14 @@
 </table>
 
 <script>
+	var records = {{ records | safe}};
 	var params = new URLSearchParams(location.search);
 	var person = params.get("person");
+	var type  = records.type
 	document.getElementById("person").append(person);
-	var records = {{ records | safe}};
+	document.getElementById("text_or_json").append(type);
+	document.getElementById("text_or_json_table").append(type);
+
 	if (person == records.person) {
 		
 		for (let i = 0; i < {{item_count|safe}}; i++){	
@@ -36,10 +36,9 @@
 			var cell_id = row.insertCell(0);
 			var cell_data = row.insertCell(1);
 			cell_id.innerHTML = records["id"][i];
-			cell_data.innerHTML = records['json'][i];
-		}
-}
-
+			cell_data.innerHTML = records['json_text'][i];
+			}
+	};
 
 //   ˅
 </script>
