@@ -1,0 +1,37 @@
+
+{% block test %}
+
+<script>
+	console.log("--- test block ---")
+</script>
+
+<div style="border: solid black;">
+    <form>
+
+        <!-- email -->
+        <label for="person">
+            Person to search for:
+            <input type="text" name="person">
+        </label>
+
+        <!-- ˅ -->
+        <label for="text">
+            Text
+            <input type="checkbox" value="text" name="type" />
+    </label>
+
+    <label for="json">
+        JSON
+        <input type="checkbox" value="json" name="type" />
+    </label>
+
+        <button >
+        <i class="fas fa-thumbs-up"></i>
+        GO!</button>
+    </form>
+</div>
+<br>
+
+
+
+{% endblock test %}
