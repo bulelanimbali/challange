@@ -1,5 +1,3 @@
-import os
-import sys
 from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -39,13 +37,13 @@ class Records(Base):
         }
 
 
-user = "challenger"
-password = "not_the_real_password"
-dbname = "coding-challenge-db"
-host = "34.84.8.142"
+# user = "challenger"
+# password = "not_the_real_password"
+# dbname = "coding-challenge-db"
+# host = "34.84.8.142"
 
 
-engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:5432/{dbname}')
+# engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:5432/{dbname}')
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

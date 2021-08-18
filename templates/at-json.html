@@ -6,10 +6,10 @@
 </script>
 
 
-<h1 style="color: coral;">Database Log of JSON</h1>
+<h1  id='text_or_json' style="color: coral;">Database Log of </h1>
 
-<h2 id="person">for peson: </h2>
-<h3 id="items">item amount: </h3>
+<h2 id="person">for peson:  </h2>
+<h3 id="items">item amount: {{ item_count }} </h3>
 
 
 <table id="table" border="1" class="dataframe">
@@ -27,52 +27,21 @@
 	var params = new URLSearchParams(location.search);
 	var person = params.get("person");
 	document.getElementById("person").append(person);
-
-	var itemNumber = {{ item_count }};
-	document.getElementById("items").append(itemNumber);
-
-	// ˅
-	var data = {{ data | safe}};
 	var records = {{ records | safe}};
-
-	let i = 0;
-
-//   ˅
-if (person) {
-	for(i=0,c=0; i < itemNumber && c < 1000; c++) {
-
-		for (let j = 0; j < records.length; j++) {
-
-			if (records[j]["person"] == person) {
-
-				for (let k = 0; k < data.length; k++) {
-
-					if (records[j]["data_id"] == data[k]["id"]) {
-						var table = document.getElementById("table");
-						var row = table.insertRow(-1);
-						var cell_id = row.insertCell(0);
-						var cell_data = row.insertCell(1);
-						cell_id.innerHTML = data[k]["id"];
-						cell_data.innerHTML = data[k]["json"];
-
-						i++;
-						
-					}
-					if (i >= itemNumber) {
-							break;
-						}
-
-				}
-
-			}
-			if (i >= itemNumber) {
-				break;
-			}
+	if (person == records.person) {
+		
+		for (let i = 0; i < {{item_count|safe}}; i++){	
+			var table = document.getElementById("table");
+			var row = table.insertRow(-1);
+			var cell_id = row.insertCell(0);
+			var cell_data = row.insertCell(1);
+			cell_id.innerHTML = records["id"][i];
+			cell_data.innerHTML = records['json'][i];
 		}
-	}
 }
 
 
+//   ˅
 </script>
 <br>
 

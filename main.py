@@ -5,13 +5,14 @@ It looks for "app" in the "main.py" class to run flask with gunicorn"""
 import time
 import logging
 from pandas import DataFrame
-from flask import Flask, render_template, request, send_file, make_response ,jsonify
+from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask.logging import create_logger
-from sqlalchemy.sql.expression import column
+from sqlalchemy.sql.expression import column, text
+import json
 
-from models import Base, Data, Records
+from models import Base, Data, Records 
 import test_gets as gets
 
 user = "challenger"
@@ -69,13 +70,6 @@ def at_log():
         'at-log.html',
         data=database_log_html)
 
-
-@app.route('/test_db', methods=['GET'])
-def test_db():
-    data = session.query(Records).filter_by(id=5).all()
-    return jsonify(f'this connected to the db {data}')
-
-
 @app.route('/test/<int:item_count>', methods=['GET'])
 def at_test(item_count=None):
     """Runs when GET requested on '/login/<user_id>'.
@@ -93,44 +87,21 @@ def at_test(item_count=None):
     hit_time = time.time()
 	#  ˄This is the script that measures the performance, not allowed to edit this section.˄ 
 
-    # <- get email query string
     person_query = request.args.get('person', type = str)
-
     type_query = request.args.get('type', type = str)
-
-    # <- get user info
-    response = gets.get_table("records")
-    if isinstance(response, Exception):
-        return render_template('at-error.html', message="There was an error.", error=response)
-
-    records_json = response["records_table"].to_json(orient="records")
-
-    response2 = gets.get_table("data")
-
-    if item_count > 100:
-
-        return render_template(
-            'at-error.html',
-            message="More then 100 items selected, too many. Item Count: ",
-            error=item_count)
-
-    if (type_query == "text"):
-
-        data_text = response2["data_table"].to_json(orient="records")
-
-        return render_template(
-            'at-text.html',
-            records=records_json,
-            data=data_text,
-            item_count=item_count,
-            hit=hit_time)
+    data = session.query(Data, Records).outerjoin(Data, Records.data_id==Data.id)\
+        .filter(Records.person==person_query).limit(item_count)
     
-    data_json = response2["data_table"].to_json(orient="records")
-
+    json_records = json.loads(json.dumps({
+        'text':[i[0].text for i in data],
+        "id":[i[0].id for i in  data],
+        "json":[i[0].json for i in data],
+        'person': data[0][1].person
+    }))
+    
     return render_template(
         'at-json.html',
-        records=records_json,
-        data=data_json,
+        records=json_records,
         item_count=item_count,
         hit=hit_time)
 
