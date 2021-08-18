@@ -6,9 +6,26 @@ import time
 import logging
 from pandas import DataFrame
 from flask import Flask, render_template, request, send_file, make_response ,jsonify
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from flask.logging import create_logger
+from sqlalchemy.sql.expression import column
 
+from models import Base, Data, Records
 import test_gets as gets
+
+user = "challenger"
+password = "not_the_real_password"
+dbname = "coding-challenge-db"
+host = "34.84.8.142"
+
+
+engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:5432/{dbname}')
+
+
+Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 app = Flask(__name__)
 
@@ -53,9 +70,10 @@ def at_log():
         data=database_log_html)
 
 
-@app.route('test_db', methods=['GET'])
+@app.route('/test_db', methods=['GET'])
 def test_db():
-    return jsonify('this connected to the db')
+    data = session.query(Records).filter_by(id=5).all()
+    return jsonify(f'this connected to the db {data}')
 
 
 @app.route('/test/<int:item_count>', methods=['GET'])
